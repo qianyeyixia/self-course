@@ -8,6 +8,9 @@
     <!-- 路由出口 -->
     <!-- 利用vue响应式：current -->
     <router-view/>
+      <p @click="$store.commit('add')">{{$store.state.counter}}</p>
+      <p @click="$store.dispatch('currenteffect', 'zhangan')">111:{{$store.state.currents}}</p>
+      {{$store.getters.numsComped}}
   </div>
 </template>
 

@@ -1,32 +1,44 @@
 // self router
 // import Vue from "vue";
+import View from "./srouter-view"
 let Vue
 class VueRouter {
     constructor(options) {
-        // Vue
-        //1.保存路由选项
         this.$options = options;
-        //初始化 current
-        const inital = window.location.hash.slice(1) || "/"
-        // Vue.util.defineReactive 可以给当前的对象指定一个响应式的属性
-        // 参考 vue.runtime.esm.js  Vue.util  public方法
-        Vue.util.defineReactive(this, 'current', inital)
-    // 2.监控 href变化
-        window.addEventListener('hashchange', () => {
-            //  例子  hash:#/about
-            this.current = window.location.hash.slice(1)
-            console.log(this.current)
-            console.log(Vue.util)
-        })
-        // 方法2 初始化 current
-        // window.addEventListener('load', () => {
-        //     this.current = "/"
-        // })
-
+        this.current = window.location.hash.slice(1) || "/"
+        Vue.util.defineReactive(this, 'matched', [])
+        // match方法可以递归便利路由表，获得匹配关系的数组
+        this.match()
+        window.addEventListener('hashchange', this.onHasChange.bind(this))
+        window.addEventListener('load', this.onHasChange.bind(this))
 
     }
 
+    onHasChange() {
+        this.current = window.location.hash.slice(1);
+        this.matched = [];
+        this.match()
+    }
 
+    match(routes) {
+      console.log(this.matched);
+        routes = routes || this.$options.routes
+        //    递归遍历路由表
+        for (const route of routes) {
+            if(route.path === '/' && this.current === '/') {
+                this.matched.push(route)
+                return
+            }
+            // /about/info
+            if(route.path !== '/' && this.current.indexOf(route.path) != -1) {
+                this.matched.push(route)
+                if(route.children) {
+                    this.match(route.children)
+                }
+                return
+            }
+        }
+    }
 
 }
 // 参数1 是 vue 的构造函数
@@ -65,28 +77,9 @@ VueRouter.install = function (_Vue) {
                     href: `#${this.to}`
                 }
             },this.$slots.default)
-            /*
-            * 等同与 <a href={'#'+ this.to}>this.$slots.default</a>
-            *
-            *
-            * */
         }
     })
-    Vue.component('router-view', {
-        render(h) {
-            let component = null;
-            //1. 获取当前的 url的 hash 部分
-            // return h('div', {}, this.$slots.defulat)
-            //2. 根据hash部分从路由表中获取对应的组件
-            const route = this.$router.$options.routes.find((route) =>
-                route.path === this.$router.current
-            );
-            if(route) {
-                component = route.component
-            }
-            return h(component)
-        }
-    })
+    Vue.component('RouterView', View)
 }
 
 export default VueRouter

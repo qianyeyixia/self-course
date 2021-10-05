@@ -3,11 +3,11 @@ import App from './App.vue'
 import './plugins/element.js'
 // import router from './krouter'
 import vueRouter from "./SRouter"
-import store from './kstore'
+// import store from './kstore'
 // import Home from "./views/Home";
 // import store from './store'
 // import router from './router'
-
+import store from "./Svuex"
 /*
 * vue 插件
 * 1.fn
@@ -28,7 +28,17 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue')
+    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
+    children: [
+        {
+            path: "/about/info",
+            component: {
+                render(h) {
+                    return h('div', 'sdfsdsdsd')
+                }
+            }
+        }
+    ]
   }
 ]
 const router = new vueRouter({
